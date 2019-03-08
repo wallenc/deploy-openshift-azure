@@ -56,7 +56,7 @@ export CNS_DEFAULT_STORAGE=true
 export DOMAIN=`domainname -d`
 
 # Determine if Commercial Azure or Azure Government
-CLOUD="AzureUSGOvernment"
+CLOUD="US"
 export CLOUD=${CLOUD^^}
 
 export MASTERLOOP=$((MASTERCOUNT - 1))
@@ -88,7 +88,8 @@ fi
 # Logging into Azure CLI
 if [ "$AADCLIENTID" != "" ]
 then
-    echo $(date) " - Logging into Azure CLI"
+    echo $(date) " - Logging into Azure CLI with $AADCLIENTID"
+    az cloud set --name AzureUSGovernment
     az login --service-principal -u $AADCLIENTID -p $AADCLIENTSECRET -t $TENANTID
     az account set -s $SUBSCRIPTIONID
 
