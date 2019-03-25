@@ -40,6 +40,42 @@ export CUSTOMMASTERCERTTYPE=${33}
 export MINORVERSION=${34}
 export BASTION=$(hostname)
 
+echo $(date) " - 1 = $1"
+echo $(date) " - 2 = $2"
+echo $(date) " - 3 = $3"
+echo $(date) " - 4 = $4"
+echo $(date) " - 5 = $5"
+echo $(date) " - 6 = $6"
+echo $(date) " - 7 = $7"
+echo $(date) " - 8 = $8"
+echo $(date) " - 9 = $9"
+echo $(date) " - 10 = $10"
+echo $(date) " - 11 = $11"
+echo $(date) " - 12 = $12"
+echo $(date) " - 13 = $13"
+echo $(date) " - 14 = $14"
+echo $(date) " - 15 = $15"
+echo $(date) " - 16 = $16"
+echo $(date) " - 17 = $17"
+echo $(date) " - 18 = $18"
+echo $(date) " - 19 = $19"
+echo $(date) " - 20 = $20"
+echo $(date) " - 21 = $21"
+echo $(date) " - 22 = $22"
+echo $(date) " - 23 = $23"
+echo $(date) " - 24 = $24"
+echo $(date) " - 25 = $25"
+echo $(date) " - 26 = $26"
+echo $(date) " - 27 = $27"
+echo $(date) " - 28 = $28"
+echo $(date) " - 29 = $29"
+echo $(date) " - 30 = $30"
+echo $(date) " - 31 = $31"
+echo $(date) " - 32 = $32"
+echo $(date) " - 33 = $33"
+echo $(date) " - 34 = $34"
+
+
 # Set CNS to default storage type.  Will be overridden later if Azure is true
 export CNS_DEFAULT_STORAGE=true
 
