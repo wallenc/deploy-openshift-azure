@@ -3,7 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"_artifactsLocation": {
-			"value": "https://raw.githubusercontent.com/wallenc/deploy-openshift-azure/master"
+			"value": "https://raw.githubusercontent.com/Microsoft/openshift-container-platform/master"
 		},
 		"masterVmSize": {
 			"value": "Standard_E2s_v3"
@@ -32,13 +32,13 @@
 			"value": "managed"
 		},
 		"openshiftClusterPrefix": {
-			"value": "vac20appecs"
+			"value": "vac20webecs2"
 		},
 		"minorVersion": {
 			"value": "69"
 		},
 		"masterInstanceCount": {
-			"value": 3 
+			"value": 3
 		},
 		"infraInstanceCount": {
 			"value": 3
@@ -119,19 +119,19 @@
 			"value": "10.2.0.0/16"
 		},
 		"masterSubnetName": {
-			"value": "mastersubnet"
+			"value": "S-1"
 		},
 		"masterSubnetPrefix": {
 			"value": "10.2.0.0/26"
 		},
 		"infraSubnetName": {
-			"value": "infrasubnet"
+			"value": "S-1"
 		},
 		"infraSubnetPrefix": {
 			"value": "10.2.0.0/16"
 		},
 		"nodeSubnetName": {
-			"value": "nodesubnet"
+			"value": "S-1"
 		},
 		"nodeSubnetPrefix": {
 			"value": "10.3.0.0/16"
@@ -149,16 +149,16 @@
 			"value": "/subscriptions/d8abb5fd-9d00-48fd-862a-0f778306cce7/resourceGroups/OpenShiftDefault/providers/Microsoft.Network/virtualNetworks/ocpvnet/subnets/S-1"
 		},
 		"masterClusterType": {
-			"value": "public"
+			"value": "private"
 		},
 		"masterPrivateClusterIp": {
-			"value": "10.2.0.30"
+			"value": "10.2.0.60"
 		},
 		"routerClusterType": {
-			"value": "public"
+			"value": "private"
 		},
 		"routerPrivateClusterIp": {
-			"value": "10.2.0.40"
+			"value": "10.2.0.61"
 		},
 		"routingCertType": {
 			"value": "selfsigned"

@@ -7,8 +7,6 @@ set -e
 export SUDOUSER=$1
 export PASSWORD="$2"
 export MASTER=$3
-export MASTERPUBLICIPHOSTNAME=$4
-export MASTERPUBLICIPADDRESS=$5
 export INFRA=$6
 export NODE=$7
 export NODECOUNT=$8
@@ -130,8 +128,7 @@ fi
 echo $(date) " - Create variable for master api certificate based on certificate type"
 if [[ $CUSTOMMASTERCERTTYPE == "custom" ]]
 then
-	MASTERCERTIFICATE="openshift_master_overwrite_named_certificates=true
-openshift_master_named_certificates=[{\"names\": [\"$MASTERPUBLICIPHOSTNAME\"], \"cafile\": \"/tmp/masterca.pem\", \"certfile\": \"/tmp/mastercert.pem\", \"keyfile\": \"/tmp/masterkey.pem\"}]"
+	MASTERCERTIFICATE="openshift_master_overwrite_named_certificates=true"
 else
 	MASTERCERTIFICATE=""
 fi
@@ -143,10 +140,6 @@ then
 	MASTERCLUSTERADDRESS="openshift_master_cluster_hostname=$MASTER01
 openshift_master_cluster_public_hostname=$PRIVATEDNS
 openshift_master_cluster_public_vip=$PRIVATEIP"
-else
-	MASTERCLUSTERADDRESS="openshift_master_cluster_hostname=$MASTERPUBLICIPHOSTNAME
-openshift_master_cluster_public_hostname=$MASTERPUBLICIPHOSTNAME
-openshift_master_cluster_public_vip=$MASTERPUBLICIPADDRESS"
 fi
 
 # Create Master nodes grouping
@@ -335,7 +328,7 @@ openshift_logging_fluentd_nodeselector={"logging":"true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra":"true"}
 openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra":"true"}
 openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra":"true"}
-openshift_logging_master_public_url=https://$MASTERPUBLICIPHOSTNAME
+
 
 # host group for masters
 [masters]
