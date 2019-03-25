@@ -164,12 +164,6 @@
 				"description": "Azure AD Client Secret"
 			}
 		},
-		"nipioDomain": {
-			"type": "string",
-			"metadata": {
-				"description": "nip.io Subdomain for application routing"
-			}
-		},
 		"customDomain": {
 			"type": "string",
 			"metadata": {
