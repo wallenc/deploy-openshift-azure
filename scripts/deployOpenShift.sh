@@ -34,12 +34,10 @@ export NODEAVAILIBILITYSET=${27}
 export MASTERCLUSTERTYPE=${28}
 export PRIVATEIP=${29}
 export PRIVATEDNS=${30}
-export MASTERPIPNAME=${31}
-export ROUTERCLUSTERTYPE=${32}
-export INFRAPIPNAME=${33}
-export CUSTOMROUTINGCERTTYPE=${34}
-export CUSTOMMASTERCERTTYPE=${35}
-export MINORVERSION=${36}
+export ROUTERCLUSTERTYPE=${31}
+export CUSTOMROUTINGCERTTYPE=${32}
+export CUSTOMMASTERCERTTYPE=${33}
+export MINORVERSION=${34}
 export BASTION=$(hostname)
 
 # Set CNS to default storage type.  Will be overridden later if Azure is true
