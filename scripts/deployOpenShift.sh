@@ -178,6 +178,9 @@ openshift_master_cluster_public_hostname=$PRIVATEDNS
 openshift_master_cluster_public_vip=$PRIVATEIP"
 fi
 
+echo $(date) " - clusteraddresse=$MASTERCLUSTERADDRESS"
+echo $(date) " - publichostname=$PRIVATEDNS"
+
 # Create Master nodes grouping
 echo $(date) " - Creating Master nodes grouping"
 MASTERLIST="0$MASTERCOUNT"
@@ -403,6 +406,8 @@ runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ans
 # Configure DNS so it always has the domain name
 echo $(date) " - Adding $DOMAIN to search for resolv.conf"
 runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN=$DOMAIN\"'"
+
+runuser $SUDOUSER -c "cat /etc/sysconfig/network-scripts/ifcfg-eth0"
 
 # Configure resolv.conf on all hosts through NetworkManager
 echo $(date) " - Restarting NetworkManager"
