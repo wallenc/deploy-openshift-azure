@@ -7,82 +7,48 @@ set -e
 export SUDOUSER=$1
 export PASSWORD="$2"
 export MASTER=$3
-export INFRA=$4
-export NODE=$5
-export NODECOUNT=$6
-export INFRACOUNT=$7
-export MASTERCOUNT=${8}
-export ROUTING=${9}
-export REGISTRYSA=${10}
-export ACCOUNTKEY="${11}"
-export METRICS=${12}
-export LOGGING=${13}
-export TENANTID=${14}
-export SUBSCRIPTIONID=${15}
-export AADCLIENTID=${16}
-export AADCLIENTSECRET="${17}"
-export RESOURCEGROUP=${18}
-export LOCATION=${19}
-export AZURE=${20}
-export STORAGEKIND=${21}
-export ENABLECNS=${22}
-export CNS=${23}
-export CNSCOUNT=${24}
-export VNETNAME=${25}
-export NODENSG=${26}
-export NODEAVAILIBILITYSET=${27}
-export MASTERCLUSTERTYPE=${28}
-export PRIVATEIP=${29}
-export PRIVATEDNS=${30}
-export ROUTERCLUSTERTYPE=${31}
-export CUSTOMROUTINGCERTTYPE=${32}
-export CUSTOMMASTERCERTTYPE=${33}
-export MINORVERSION=${34}
+export MASTERPUBLICIPHOSTNAME=$4
+export MASTERPUBLICIPADDRESS=$5
+export INFRA=$6
+export NODE=$7
+export NODECOUNT=$8
+export INFRACOUNT=$9
+export MASTERCOUNT=${10}
+export ROUTING=${11}
+export REGISTRYSA=${12}
+export ACCOUNTKEY="${13}"
+export METRICS=${14}
+export LOGGING=${15}
+export TENANTID=${16}
+export SUBSCRIPTIONID=${17}
+export AADCLIENTID=${18}
+export AADCLIENTSECRET="${19}"
+export RESOURCEGROUP=${20}
+export LOCATION=${21}
+export AZURE=${22}
+export STORAGEKIND=${23}
+export ENABLECNS=${24}
+export CNS=${25}
+export CNSCOUNT=${26}
+export VNETNAME=${27}
+export NODENSG=${28}
+export NODEAVAILIBILITYSET=${29}
+export MASTERCLUSTERTYPE=${30}
+export PRIVATEIP=${31}
+export PRIVATEDNS=${32}
+export MASTERPIPNAME=${33}
+export ROUTERCLUSTERTYPE=${34}
+export INFRAPIPNAME=${35}
+export CUSTOMROUTINGCERTTYPE=${36}
+export CUSTOMMASTERCERTTYPE=${37}
+export MINORVERSION=${38}
 export BASTION=$(hostname)
-
-echo $(date) " - 1 = $SUDOUSER"
-echo $(date) " - 2 = $PASSWORD"
-echo $(date) " - 3 = $MASTER"
-echo $(date) " - 4 = $INFRA"
-echo $(date) " - 5 = $NODE"
-echo $(date) " - 6 = $NODECOUNT"
-echo $(date) " - 7 = $INFRACOUNT"
-echo $(date) " - 8 = $MASTERCOUNT"
-echo $(date) " - 9 = $ROUTING"
-echo $(date) " - 10 = $REGISTRYSA"
-echo $(date) " - 11 = $ACCOUNTKEY"
-echo $(date) " - 12 = $METRICS"
-echo $(date) " - 13 = $LOGGING"
-echo $(date) " - 14 = $TENANTID"
-echo $(date) " - 15 = $SUBSCRIPTIONID"
-echo $(date) " - 16 = $AADCLIENTID"
-echo $(date) " - 17 = $AADCLIENTSECRET"
-echo $(date) " - 18 = $RESOURCEGROUP"
-echo $(date) " - 19 = $LOCATION"
-echo $(date) " - 20 = $AZURE"
-echo $(date) " - 21 = $STORAGEKIND"
-echo $(date) " - 22 = $ENABLECNS"
-echo $(date) " - 23 = $CNS"
-echo $(date) " - 24 = $CNSCOUNT"
-echo $(date) " - 25 = $VNETNAME"
-echo $(date) " - 26 = $NODENSG"
-echo $(date) " - 27 = $NODEAVAILABILITYSET"
-echo $(date) " - 28 = $MASTERCLUSTERTYPE"
-echo $(date) " - 29 = $PRIVATEIP"
-echo $(date) " - 30 = $PRIVATEDNS"
-echo $(date) " - 31 = $ROUTERCLUSTERTYPE"
-echo $(date) " - 32 = $CUSTOMROUTINGCERTTYPE"
-echo $(date) " - 33 = $CUSTOMMASTERCERTTYPE"
-echo $(date) " - 34 = $MINORVERSION"
-
 
 # Set CNS to default storage type.  Will be overridden later if Azure is true
 export CNS_DEFAULT_STORAGE=true
 
 # Setting DOMAIN variable
-export DOMAIN=`domainname -d`
-
-echo $(date) " - domainname = $DOMAIN"
+export DOMAIN=`contoso.com`
 
 # Determine if Commercial Azure or Azure Government
 CLOUD=$( curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/location?api-version=2017-04-02&format=text" | cut -c 1-2 )
@@ -119,7 +85,7 @@ if [[ $AZURE == "true" ]]
 then
     CLOUDKIND="openshift_cloudprovider_kind=azure
 openshift_cloudprovider_azure_client_id=$AADCLIENTID
-openshift_cloudprovider_azure_client_secret=$AADCLIENTSECRET
+openshift_cloudprovider_azure_client_secret='$AADCLIENTSECRET'
 openshift_cloudprovider_azure_tenant_id=$TENANTID
 openshift_cloudprovider_azure_subscription_id=$SUBSCRIPTIONID
 openshift_cloudprovider_azure_cloud=$CLOUDNAME
@@ -164,7 +130,8 @@ fi
 echo $(date) " - Create variable for master api certificate based on certificate type"
 if [[ $CUSTOMMASTERCERTTYPE == "custom" ]]
 then
-	MASTERCERTIFICATE="openshift_master_overwrite_named_certificates=true"
+	MASTERCERTIFICATE="openshift_master_overwrite_named_certificates=true
+openshift_master_named_certificates=[{\"names\": [\"$MASTERPUBLICIPHOSTNAME\"], \"cafile\": \"/tmp/masterca.pem\", \"certfile\": \"/tmp/mastercert.pem\", \"keyfile\": \"/tmp/masterkey.pem\"}]"
 else
 	MASTERCERTIFICATE=""
 fi
@@ -176,10 +143,11 @@ then
 	MASTERCLUSTERADDRESS="openshift_master_cluster_hostname=$MASTER01
 openshift_master_cluster_public_hostname=$PRIVATEDNS
 openshift_master_cluster_public_vip=$PRIVATEIP"
+else
+	MASTERCLUSTERADDRESS="openshift_master_cluster_hostname=$MASTERPUBLICIPHOSTNAME
+openshift_master_cluster_public_hostname=$MASTERPUBLICIPHOSTNAME
+openshift_master_cluster_public_vip=$MASTERPUBLICIPADDRESS"
 fi
-
-echo $(date) " - clusteraddresse=$MASTERCLUSTERADDRESS"
-echo $(date) " - publichostname=$PRIVATEDNS"
 
 # Create Master nodes grouping
 echo $(date) " - Creating Master nodes grouping"
@@ -320,8 +288,9 @@ $PROXY
 
 # Workaround for docker image failure
 # https://access.redhat.com/solutions/3480921
-oreg_url=registry.access.redhat.com/openshift3/ose-\${component}:\${version}
-openshift_examples_modify_imagestreams=true
+oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
+oreg_auth_user=cwallen-msft
+oreg_auth_password=C.@rieN1
 
 # default selectors for router and registry services
 openshift_router_selector='node-role.kubernetes.io/infra=true'
@@ -367,7 +336,7 @@ openshift_logging_fluentd_nodeselector={"logging":"true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra":"true"}
 openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra":"true"}
 openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra":"true"}
-
+openshift_logging_master_public_url=https://$MASTERPUBLICIPHOSTNAME
 
 # host group for masters
 [masters]
@@ -405,9 +374,7 @@ runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ans
 
 # Configure DNS so it always has the domain name
 echo $(date) " - Adding $DOMAIN to search for resolv.conf"
-runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN=$DOMAIN\"'"
-
-runuser $SUDOUSER -c "cat /etc/sysconfig/network-scripts/ifcfg-eth0"
+runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN=contoso.com\"'"
 
 # Configure resolv.conf on all hosts through NetworkManager
 echo $(date) " - Restarting NetworkManager"
@@ -515,6 +482,14 @@ then
         exit 12
     fi
 fi
+
+# Creating variables file for private master and Azure AD configuration playbook
+echo $(date) " - Creating variables file for future playbooks"
+cat > /home/$SUDOUSER/openshift-container-platform-playbooks/vars.yaml <<EOF
+admin_user: $SUDOUSER
+master_lb_private_dns: $PRIVATEDNS
+domain: $DOMAIN
+EOF
 
 # Configure cluster for private masters
 if [[ $MASTERCLUSTERTYPE == "private" ]]
