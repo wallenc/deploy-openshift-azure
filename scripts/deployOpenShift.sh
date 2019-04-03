@@ -79,7 +79,7 @@ echo $(date) " - 34 = $MINORVERSION"
 export CNS_DEFAULT_STORAGE=true
 
 # Setting DOMAIN variable
-export DOMAIN=`contoso.com`
+export DOMAIN='contoso.com'
 
 echo $(date) " - domainname = $DOMAIN"
 
