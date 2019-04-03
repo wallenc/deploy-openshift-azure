@@ -318,10 +318,11 @@ $CUSTOMCSS
 $ROUTINGCERTIFICATE
 $MASTERCERTIFICATE
 $PROXY
+openshift_domain=$DOMAIN
 
 # Workaround for docker image failure
 # https://access.redhat.com/solutions/3480921
-oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
+oreg_url=registry.redhat.io/openshift3/ose-\${component}:\${version}
 oreg_auth_user=cwallen-msft
 oreg_auth_password=C.@rieN1
 
@@ -407,7 +408,7 @@ runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ans
 
 # Configure DNS so it always has the domain name
 echo $(date) " - Adding $DOMAIN to search for resolv.conf"
-runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN=contoso.com\"'"
+runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN= {{openshift_domain}}\"'"
 
 # Configure resolv.conf on all hosts through NetworkManager
 echo $(date) " - Restarting NetworkManager"
@@ -424,10 +425,6 @@ sleep 20
 echo $(date) " - Running Prerequisites via Ansible Playbook"
 runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml"
 echo $(date) " - Prerequisites check complete"
-
-sudo iptables -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 53 -j ACCEPT
-sudo iptables -A OS_FIREWALL_ALLOW -p udp -m state --state NEW -m udp --dport 53 -j ACCEPT
-sudo iptables-save
 
 # Initiating installation of OpenShift Container Platform using Ansible Playbook
 echo $(date) " - Installing OpenShift Container Platform via Ansible Playbook"
