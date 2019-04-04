@@ -408,7 +408,7 @@ runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ans
 
 # Configure DNS so it always has the domain name
 echo $(date) " - Adding $DOMAIN to search for resolv.conf"
-runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN= {{openshift_domain}}\"'"
+runuser $SUDOUSER -c "ansible all -o -f 30 -b -m lineinfile -a 'dest=/etc/sysconfig/network-scripts/ifcfg-eth0 line=\"DOMAIN={{openshift_domain}}\"'"
 
 # Configure resolv.conf on all hosts through NetworkManager
 echo $(date) " - Restarting NetworkManager"
@@ -426,7 +426,34 @@ echo $(date) " - Running Prerequisites via Ansible Playbook"
 runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml"
 echo $(date) " - Prerequisites check complete"
 
+echo $(date) " - Create yml to add iptables rules for dnsmasq"
+cat > /home/$SUDOUSER/openshift-container-platform-playbooks/add_dnsmasq_iptables.yml <<EOF
+- hosts: all
+  gather_facts: no
+  tasks:
+    - iptables:
+        action: insert
+        chain: INPUT
+        protocol: tcp
+        destination_port: 53
+        ctstate: NEW,ESTABLISHED,RELATED
+        jump: ACCEPT
+        comment: dnsmasq
+    - iptables:
+        action: insert
+        chain: INPUT
+        protocol: udp
+        destination_port: 53
+        ctstate: NEW
+        jump: ACCEPT
+        comment: dnsmasq
+    - command: service iptables save
+EOF
+
 # Initiating installation of OpenShift Container Platform using Ansible Playbook
+echo $(date) " - Adding dnsmasq rules to iptables"
+runuser -l $SUDOUSER -c "ansible-playbook -f 30 /home/$SUDOUSER/openshift-container-platform-playbooks/add_dnsmasq_iptables.yml"
+
 echo $(date) " - Installing OpenShift Container Platform via Ansible Playbook"
 runuser -l $SUDOUSER -c "ansible-playbook -f 30 /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml"
 if [ $? -eq 0 ]
